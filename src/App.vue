@@ -1,20 +1,30 @@
 <template>
   <div class="app">
-    <form>
-      <h4>Создание поста</h4>
-      <input v-bind:value="title" @input="title = $event.target.value" class="input" type="text" placeholder="Название">
-      <input v-bind:value="body" @input="body = $event.target.value" class="input" type="text" placeholder="Описание">
-      <button class="btn" @click="createPost">Создать</button>
-    </form>
-    <div class="post" v-for="post in posts">
-      <div><strong>Название:</strong> {{post.title}}</div>
-      <div><strong>Описание:</strong> {{post.body}}</div>
-    </div>
+    <h1>Страница с постами</h1>
+    <my-button @click="showDialog"
+               style="margin: 15px 0">
+      Создать пост
+    </my-button>
+    <my-dialog v-model:show="dialogVisible">
+      <post-form @create="createPost"/>
+    </my-dialog>
+    <post-list :posts="posts"
+               @remove="removePost"
+    />
   </div>
 </template>
 
 <script>
+import PostForm from "@/components/PostForm";
+import PostList from "@/components/PostList";
+import MyDialog from "@/components/UI/MyDialog";
+import MyButton from "@/components/UI/MyButton";
   export default {
+    components: {
+      MyButton,
+      MyDialog,
+      PostList, PostForm
+    },
     data() {
       return {
         posts: [
@@ -22,19 +32,19 @@
           {id: 2, title: 'Javascript 2', body: 'Описание поста 2'},
           {id: 3, title: 'Javascript 3', body: 'Описание поста 3'},
         ],
-        title: '',
-        body: ''
+        dialogVisible: false
       }
     },
     methods: {
-      createPost(){
-        const newPost = {
-          id: Date.now(),
-          title: this.title,
-          body: this.body,
-        }
-
-        this.posts.push(newPost);
+      createPost(post) {
+        this.posts.push(post);
+        this.dialogVisible = false;
+      },
+      removePost(post) {
+        this.posts = this.posts.filter(p => p.id !== post.id);
+      },
+      showDialog() {
+        this.dialogVisible = true
       }
     }
   }
@@ -49,33 +59,6 @@
 
   .app {
     padding: 20px;
-  }
-
-  .post {
-    padding: 15px;
-    border: 2px solid teal;
-    margin-top: 15px;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .input {
-    width: 100%;
-    border: 1px solid teal;
-    padding: 10px 15px;
-    margin-top: 15px;
-  }
-
-  .btn {
-    margin-top: 15px;
-    align-self: flex-end;
-    padding: 10px 15px;
-    background: none;
-    color: teal;
-    border: 1px solid teal;
   }
 
 </style>
